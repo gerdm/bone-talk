@@ -18,8 +18,7 @@ Framework that encompasses many Bayesian models that *tackle* online learning in
 
 * By *Bayesian* we mean using Bayes' rule to update beliefs.
 * By *online* we mean observing a stream of datapoints and making a decision about the next datapoint.
-* By *non-stationary* we mean incomplete knowledge of the evolution of the data-generating process (DGP),
-which we model through an auxiliary variable.
+* By *non-stationary* we mean that the data generating process (DGP) changes through time.
 
 ---
 
