@@ -108,8 +108,10 @@ In the non-linear classification setting,
 $$
     h(\theta, x) = \sigma(\phi_\theta(x)),
 $$
-
 with $\phi_\theta: \reals^M \to \reals$ a neural network with real-valued output unit.
+
+Then $p(y_t \vert x_t) = {\rm Bern}(y_t \vert h(\theta, x))$
+
 
 ---
 layout: center
@@ -120,7 +122,7 @@ Assume that observations $y_{1:t}$ are conditionally independent given $\theta$.
 
 
 $$
-    p(\theta | {\cal D}_{1:t}) \propto p(\theta)\, p(y_t \vert \theta, x_t)\,\prod_{k=1}^t p(y_t \vert \theta, x_t).
+    p(\theta | {\cal D}_{1:t}) \propto p(\theta)\,\prod_{k=1}^t p(y_t \vert \theta, x_t).
 $$
 
 
@@ -555,9 +557,7 @@ layout: center
 * (M.3) A model for prior beliefs (conditioned on $\psi_t$ and data ${\cal D}_{1:t-1}$) ---
 $\tau(\theta \vert \psi_t, {\cal D}_{1:t-1})$.
 * (A.1) An algorithm to weight over choices of $\theta$ (conditioned on data ${\cal D}_{1:t}$) ---
-
 $\lambda(\theta;\,\psi_t, {\cal D}_{1:t}) \propto \tau(\theta \vert \psi_t, {\cal D}_{1:t-1}) p(y_t \vert \theta, x_t)$.
-
 * (A.2) An algorithm to weight over choices of $\psi_t$ (conditioned on data ${\cal D}_{1:t}$).
 
 
@@ -768,5 +768,5 @@ BONE methods are written as instances of:
 layout: end
 ---
 
-github.com/gerdm/BONE  
+gerdm.github.io/posts/bone-talk
 arxiv.org/abs/2411.10153
