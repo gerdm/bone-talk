@@ -768,5 +768,5 @@ BONE methods are written as instances of:
 layout: end
 ---
 
-gerdm.github.io/posts/bone-talk  
-arxiv.org/abs/2411.10153
+[gerdm.github.io/posts/bone-slides](https://gerdm.github.io/posts/bone-slides)  
+[arxiv.org/abs/2411.10153](https://arxiv.org/abs/2411.10153)
