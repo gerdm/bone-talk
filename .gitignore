@@ -1,5 +1,8 @@
+# Figures
+*.gif
+*.png
+
 node_modules
-.DS_Store
 dist
 *.local
 index.html

@@ -1,12 +1,4 @@
 /* style.css */
-img {
-    max-width:80%;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    /* bring your own prefixes */
-    transform: translate(-50%, -50%);
-}
 
 .centered {
     position: fixed;
@@ -15,6 +7,7 @@ img {
     /* bring your own prefixes */
     transform: translate(-50%, -50%);
   }
+
   
 .horizontal-center {
     display: block;
@@ -31,3 +24,15 @@ img {
 .float-left{
       float:left;
   }
+
+/*  Make font smaller */
+.footnotes{
+    font-size: 0.6em;
+    /* margin-top: 0.5em;
+    margin-bottom: 0.5em; */
+}
+
+/* TODO: fix for larger elements */
+li.footnote-item{
+  margin: -2em 0;
+}
