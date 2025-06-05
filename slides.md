@@ -13,19 +13,24 @@ mdc: true
 ---
 
 # Motivation
-
 In recent years there's been a surge in developing machine learning (ML) methods that tackle _non-stationarity_.
+
 * Contextual bandits.
 * Test-time adaptation.
 * Reinforcement learning.
 * (Online) continual learning --- catastrophic forgetting / plasticity-stability tradeoff.
 * Dataset shift --- covariance shift, prior probability shift, domain shift, etc.
 
+
+<v-click>
+
 Various _Bayesian_ methods have been proposed to tackle some of the problems above.
  
 However, there hasn't been a clear way to distinguish these Bayesian methods
 and there hasn't been enough recognition of methods outside the ML literature that also tackle
 non-stationarity (and that can be applied to ML problems).
+
+</v-click>
 
 ---
 layout: two-cols-header
@@ -51,6 +56,9 @@ layout: two-cols-header
 # Why the BONE framework?
 
 Allows us to
+
+<v-clicks>
+
 1. Categorise the various methods that tackle inference under _non-stationarity_ under a common (algorithmic) language
      *  machine learning --- contextual bandits / continual learning / reinforcement learning
      * statistics --- segmentation / switching state-space models
@@ -58,6 +66,8 @@ Allows us to
 1. Plug-and-play implementation in Jax: [github.com/gerdm/BONE](https://github.com/gerdm/BONE).
 1. Extend application of existing methods (use method developed for field A and apply to field B).
 1. Develop new methods.
+
+</v-clicks>
 
 
 ---
