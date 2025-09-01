@@ -12,8 +12,28 @@ mdc: true
 
 ---
 
+## How do we create agents that can continually learn and adapt to their environment?
+
+<v-click>
+Two requirements:
+
+ * The ability to learn continually from streaming datasets.
+ * The ability to adapt when the data-generating process changes.
+</v-click>
+
+<v-click>
+
+We present a Bayesian perspective to tackle these two challenges:
+* We update beliefs with new evidence using Bayes' rule
+* We adapt to regime changes as defined by hierarchical state-space models
+
+
+</v-click>
+
+----
+
 # Motivation
-In recent years there's been a surge in developing machine learning (ML) methods that tackle _non-stationarity_.
+Learning and adaptation (in non-stationary environments) has been studied under different names and different setups in AI/ML:
 
 * Contextual bandits.
 * Test-time adaptation.
@@ -30,18 +50,20 @@ Various _Bayesian_ methods have been proposed to tackle some of the problems abo
 
 <v-click>
  
-However, there hasn't been a clear way to distinguish these Bayesian methods
-and there hasn't been enough recognition of methods outside the ML literature that also tackle
+However,
+* there hasn't been a clear way to distinguish these Bayesian methods and
+* there hasn't been enough recognition of methods outside the ML literature that also tackle
 non-stationarity (and that can be applied to ML problems).
 
-**We seek to unify methods that perform Bayesian online learning in non-stationary environments.**
 
 </v-click>
 
 
 ---
 
-# Why a unifying framework?
+## A unifying framework
+
+**We seek to unify methods that perform Bayesian online learning in non-stationary environments.**
 
 Allows us to
 
@@ -100,37 +122,12 @@ layout: center
 # (M.1) and (A.1): Bayesian online learning
 Choices of measurement function and posterior computation
 
----
+----
 
-## Parametric Bayes for online learning: Choice of (M.1) and (A.1)
+## One-step-ahead Bayesian prediction (**M.1**)
 
-Let $h(\vtheta, \vx) = \mathbb{E}[\vy \cond \vtheta, \vx]$,
-where $h: \reals^D\times\reals^M \to \reals^o$
-be a model for the mean of $\vy$, conditioned on latent variables (parameters) $\vtheta_t$
-and features $\vx_t$ (the measurement model), e.g., a neural network **(M.1)**.
-
-
-
-Generalised (recursive) Bayesian online learning amounts to finding a sequence of posterior densities.
-
-$$
-    p(\vtheta \cond \data_{1:t}) \propto
-    \underbrace{
-    p(\vtheta \cond \data_{1:t-1})
-    }_\text{prior}
-    \,
-    \underbrace{
-    \exp(-\ell(\vtheta; \vy_t, \vx_t)).
-    }_\text{loss function}
-$$
-
-In _classical_ Bayes, $\ell(\vtheta; \vy_t, \vx_t) = -\log p(\vy_t \cond \vtheta, \vx_t)$
-
-
-
----
-
-## One-step-ahead prediction
+Let $p(y \mid \vtheta,\,\vx)$ be a probabilistic _observation_ model with
+$\mathbb{E}[\vy \cond \vtheta, \vx] = h(\vtheta, \vx)$ the _conditional measurement function_.
 
 Given $\vx_{t+1}$ and $\data_{1:t}$,
 the one-step-ahead prediction (posterior predictive mean) is
@@ -143,6 +140,65 @@ $$
     \overbrace{p(\vtheta_t \cond \data_{1:t})}^\text{posterior density}
     \,{\rm d}\vtheta_t.
 $$
+
+<v-click>
+
+* $h(\vtheta, \vx) = \vtheta^\intercal\,\vx$ (linear regression)
+* $h(\vtheta, \vx) = \sigma(\vtheta^\intercal\,\vx)$ (logistic regression)
+* $h(\vtheta, \vx) = \vtheta_2^\intercal\,{\rm Relu}(\vtheta_1^\intercal\,\vx + b_1) + b_2$ (single-hidden layer neural-network)
+* $h(\vtheta, \vx) = ...$ (Your favourite neural network architecture)
+
+</v-click>
+
+
+---
+
+## Bayes for online learning: posterior estimation
+
+Consider a prior $p(\vtheta)$,
+a measurement model $p(y \mid \vtheta,\,\vx)$,
+and
+a dataset $\data_{1:t}$.
+
+<v-click>
+
+**Static Bayes.**  
+The _batch_ posterior over model parameters at time $t$ is
+$$
+    p(\vtheta \mid \data_{1:t}) \propto p(\vtheta)\,\prod_{\tau=1}^t p(\vy_\tau \mid \vtheta, \vx_\tau)
+$$
+
+</v-click>
+
+<v-click>
+
+**Recursive Bayes.**  
+Having the _prior_ $p(\vtheta \mid \data_{1:t-1})$, the _recursive_ posterior over model parameters
+at time $t$ is
+
+$$
+    p(\vtheta \mid \data_{1:t}) \propto p(\vtheta \mid \data_{1:t-1})\,p(\vy_t \mid \vtheta, \vx_t).
+$$
+
+</v-click>
+
+<v-click>
+
+**Generalised recursive Bayes.**
+$$
+    p(\vtheta \cond \data_{1:t}) \propto
+        p(\vtheta \cond \data_{1:t-1})
+    \,
+        \exp(-\ell(\vtheta; \vy_t, \vx_t)).
+$$
+
+In _classical_ Bayes, $\ell(\vtheta; \vy_t, \vx_t) = -\log p(\vy_t \cond \vtheta, \vx_t)$
+
+</v-click>
+
+
+
+
 
 
 ---
@@ -161,22 +217,36 @@ $$
 \end{aligned}
 $$
 
+
+---
+
+##  Bayes for online learning: Choice of (M.1) and (A.1)
+
+
+How do we find the recursive estimates for $p(\vtheta \mid \data_{1:t})$?
+
 * Closed-form solution intractable except in a few special cases, e.g., linear Gaussian with Gaussian priors or conjugate priors.
-* Need to specify a density for $\vy$ whose conditional mean (given $\vtheta$ and $\vx$) is $h(\vtheta, \vx)$.
 * In most cases, we resort to an approximation. We denote the approximation to the posterior by the algorithmic choice **(A.1)**.
+
+
 
 ---
 
 ## (Recursive) variational Bayes methods
-Suppose
-
+Suppose $q_0(\vtheta) = {\cal N}(\vtheta \mid \vmu_0, \vSigma_0)$, then
 $$
-    \mu_t, \Sigma_t = {\bf D}_\text{KL}
+    q_{t}(\vtheta) \triangleq {\cal N}(\vtheta \mid \vmu_t, \vSigma_t),
+$$
+
+with 
+$$
+    \vmu_t, \vSigma_t = \argmin_{\vmu, \vSigma}{\bf D}_\text{KL}
     \Big(
-        {\cal N}(\vtheta \cond \mu, \Sigma) \,\|\,
-        p(\vtheta \cond \data_{1:t-1})\,\exp(-\ell(\vtheta; \vy_t, \vx_t))
+        {\cal N}(\vtheta \cond \vmu, \vSigma) \,\|\,
+        q_{t-1}(\vtheta)\,\exp(-\ell(\vtheta; \vy_t, \vx_t))
     \Big).
 $$
+
 
 
 A convenient choice: density is fully specified by the first two moments only.
@@ -187,7 +257,7 @@ A convenient choice: density is fully specified by the first two moments only.
 ## Moment-matched linear Gaussian (LG)
 * Suppose $p(\vtheta \cond \data_{1:t-1}) = {\cal N}(\vtheta \cond \vmu_{t-1}, \vSigma_{t-1})$.
 * Linearise measurement function **(M.1)** around the previous mean $\vmu_{t-1}$
-and model likelihood as linear Gaussian.
+and model as linear Gaussian.
 
 Consider the likelihood
 
@@ -228,7 +298,7 @@ $$
 
 ---
 
-## The choice of measurement model **(M.1)**: two hidden-layer neural network
+### The choice of measurement model **(M.1)**: two hidden-layer neural network
 
 Take
 $$
@@ -237,7 +307,19 @@ $$
 
 with $\phi_\theta: \reals^M \to \reals$ a two-layered neural network with real-valued output unit
 
-Then, $\hat{p}(y_t \cond \theta, x_t) = {\rm Bern}(y_t \cond h(\theta, x_t))$.
+Take the model $\hat{p}(y_t \cond \theta, x_t) = {\rm Bern}(y_t \cond h(\theta, x_t))$.
+
+```python
+class MLP(nn.Module):
+    @nn.compact
+    def __call__(self, x):
+        x = nn.Dense(10)(x)
+        x = nn.relu(x)
+        x = nn.Dense(10)(x)
+        x = nn.relu(x)
+        x = nn.Dense(1)
+        return jax.nn.sigmoid(x)
+```
 
 
 ---
@@ -371,7 +453,6 @@ What we mean by a _regime_.
 ## Changepoint location (CPL)
 * Binary sequence of changepoint locations.
 * Encodes number of timesteps since last changepoint, count of changepoints, and location of changepoints.
-* .
 
 ![Changepoint location auxiliary variable](./images/auxvar-cpl.png)
 
@@ -395,7 +476,6 @@ What we mean by a _regime_.
 
 ## Mixture of experts (ME)
 * Choices of over a fixed number of models.
-* .
 
 ![Mixture of experts auxiliary variable](./images/auxvar-me.png)
 
@@ -493,7 +573,7 @@ $\mu_0$ and $\Sigma_0$ are pre-defined prior mean and covariance.
 ---
 
 ## `CPP-OU` --- changepoint probability with Ornstein-Uhlenbeck process
-* $\psi_t = \upsilon_t$.
+* $\psi_t = \upsilon_t \in (0, 1]$.
 * Mean reversion to the prior as a function of the probability of a changepoint:
 
 $$
@@ -508,7 +588,7 @@ $$
 
 
 ## `CPL-sub` --- changepoint location with subset of data
-* $\psi_t = s_{1:t}$.
+* $\psi_t = s_{1:t} \in \{0,1\}^t$.
 
 
 $$
