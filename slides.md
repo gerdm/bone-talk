@@ -122,33 +122,18 @@ layout: center
 # (M.1) and (A.1): Bayesian online learning
 Choices of measurement function and posterior computation
 
-----
+---
 
-## One-step-ahead Bayesian prediction (**M.1**)
-
+## Choice of measurement function (M.1)
 Let $p(y \mid \vtheta,\,\vx)$ be a probabilistic _observation_ model with
 $\mathbb{E}[\vy \cond \vtheta, \vx] = h(\vtheta, \vx)$ the _conditional measurement function_.
-
-Given $\vx_{t+1}$ and $\data_{1:t}$,
-the one-step-ahead prediction (posterior predictive mean) is
-
-$$
-    \hat{\vy}_{t+1}
-    = \mathbb{E}[h(\vtheta_t, \vx_{t+1}) \cond \data_{1:t}]
-    = \int
-    \underbrace{h(\vtheta_t, \vx_{t+1})}_\text{measurement fn.}
-    \overbrace{p(\vtheta_t \cond \data_{1:t})}^\text{posterior density}
-    \,{\rm d}\vtheta_t.
-$$
-
-<v-click>
 
 * $h(\vtheta, \vx) = \vtheta^\intercal\,\vx$ (linear regression)
 * $h(\vtheta, \vx) = \sigma(\vtheta^\intercal\,\vx)$ (logistic regression)
 * $h(\vtheta, \vx) = \vtheta_2^\intercal\,{\rm Relu}(\vtheta_1^\intercal\,\vx + b_1) + b_2$ (single-hidden layer neural-network)
 * $h(\vtheta, \vx) = ...$ (Your favourite neural network architecture)
 
-</v-click>
+
 
 
 ---
@@ -197,10 +182,6 @@ In _classical_ Bayes, $\ell(\vtheta; \vy_t, \vx_t) = -\log p(\vy_t \cond \vtheta
 </v-click>
 
 
-
-
-
-
 ---
 
 ## Recursive posterior estimation and prediction (A.1)
@@ -217,6 +198,56 @@ $$
 \end{aligned}
 $$
 
+---
+zoom: 0.9
+---
+
+## One-step-ahead Bayesian prediction
+
+Let $p(y \mid \vtheta,\,\vx)$ be a probabilistic _observation_ model with
+$\mathbb{E}[\vy \cond \vtheta, \vx] = h(\vtheta, \vx)$ the _conditional measurement function_.
+Given $\vx_{t+1}$ and $\data_{1:t}$,
+one can do the following predictions.
+
+
+<v-click> 
+
+**Bayesian posterior predictive mean**
+$$
+    \hat{\vy}_{t+1}
+    = \mathbb{E}[h(\vtheta_t, \vx_{t+1}) \cond \data_{1:t}]
+    = \int
+    \underbrace{h(\vtheta_t, \vx_{t+1})}_\text{measurement fn.}
+    \overbrace{p(\vtheta_t \cond \data_{1:t})}^\text{posterior density}
+    \,{\rm d}\vtheta_t.
+$$
+
+</v-click>
+
+<v-click> 
+
+**MAP approximation**
+$$
+    \hat{\vy}_{t+1}
+    = \mathbb{E}[h(\vtheta_t, \vx_{t+1}) \mid \data_{1:t}]
+    \approx h(\vtheta_*, \vx_{t+1}),
+$$
+
+with $\vtheta_* = \argmax_{\vtheta}\,p(\vtheta \mid \data_{1:t})$
+
+</v-click>
+
+<v-click> 
+
+**Posterior sampling**
+
+$$
+    \hat{\vy}_{t+1} = h(\hat{\vtheta}, \vx_{t+1}),
+$$
+
+with $\hat{\vtheta} \sim p(\vtheta \mid \data_{1:t})$.
+
+</v-click>
 
 ---
 
@@ -232,7 +263,7 @@ How do we find the recursive estimates for $p(\vtheta \mid \data_{1:t})$?
 
 ---
 
-## (Recursive) variational Bayes methods
+## Example: (Recursive) variational Bayes methods
 Suppose $q_0(\vtheta) = {\cal N}(\vtheta \mid \vmu_0, \vSigma_0)$, then
 $$
     q_{t}(\vtheta) \triangleq {\cal N}(\vtheta \mid \vmu_t, \vSigma_t),
@@ -254,7 +285,7 @@ A convenient choice: density is fully specified by the first two moments only.
 
 ---
 
-## Moment-matched linear Gaussian (LG)
+## Example: Moment-matched linear Gaussian (LG)
 * Suppose $p(\vtheta \cond \data_{1:t-1}) = {\cal N}(\vtheta \cond \vmu_{t-1}, \vSigma_{t-1})$.
 * Linearise measurement function **(M.1)** around the previous mean $\vmu_{t-1}$
 and model as linear Gaussian.
